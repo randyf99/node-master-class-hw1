@@ -39,5 +39,36 @@ var serverResponse = function(req, res) {
   var path = parsedUrl.pathname;
   var trimmedPath = path.replace(/^\/+|\/+$/g, '');
 
-  res.end(trimmedPath);
+  // Set headers
+
+  // get hendler for the request.
+  var chosenHandler = typeof router[trimmedPath] !== 'undefined' ? router[trimmedPath] : handlers.notFound;
+
+  chosenHandler(function(statusCode, payLoad) {
+    statusCode = typeof statusCode == 'number' ? statusCode : 200;
+    payLoad = typeof payLoad == 'object' ? payLoad : {};
+
+    var payloadJSON = JSON.stringify(payLoad);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.writeHead(statusCode);
+    res.end(payloadJSON);
+  });
+};
+
+// handlers
+var handlers = {};
+
+handlers.hello = function(cb) {
+  cb(200, { message: 'Hello everyone' });
+};
+
+handlers.notFound = function(cb) {
+  cb(400);
+};
+
+// request router
+var router = {
+  hello: handlers.hello,
+  notFound: handlers.notFound
 };
