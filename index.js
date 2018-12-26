@@ -2,6 +2,7 @@
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
+var url = require('url');
 
 // User defined modules
 var config = require('./config');
@@ -31,5 +32,12 @@ httpsServer.listen(config.httpsPort, function() {
 });
 
 var serverResponse = function(req, res) {
-  res.end('Hello');
+  // Get URL
+  var parsedUrl = url.parse(req.url, true);
+
+  // Get Path
+  var path = parsedUrl.pathname;
+  var trimmedPath = path.replace(/^\/+|\/+$/g, '');
+
+  res.end(trimmedPath);
 };
